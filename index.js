@@ -16,9 +16,10 @@ app.set("view engine", "html");
 
 app.get("/", (req, res) => {
 	const orders = coffee.length;
-	const cost = coffee.reduce((accum, curr) => {
+	let cost = coffee.reduce((accum, curr) => {
 		return (accum += curr.cost);
 	}, 0);
+	cost = parseFloat(cost.toFixed(2));
 	res.render("index", {
 		partials: {
 			head: "/partials/header",
@@ -66,7 +67,7 @@ app.get("/order/:kind", (req, res) => {
 	const allOrders = coffee
 		.filter((o) => o.order === kind)
 		.map((e) => {
-			return `<li>${e.order} : ${e.cost}</li>`;
+			return `<li>$${parseFloat(e.cost).toFixed(2)}</li>`;
 		})
 		.join("");
 
@@ -76,6 +77,7 @@ app.get("/order/:kind", (req, res) => {
 			foot: "/partials/footer",
 		},
 		locals: {
+			order: kind,
 			allOrders,
 		},
 	});
@@ -124,6 +126,10 @@ app.get("/products/sales", (req, res) => {
 			saleItems,
 		},
 	});
+});
+
+app.get("*", (req, res) => {
+	res.status(404).send(`<h1>PAGE NOT FOUND</h1>`);
 });
 
 server.listen(port, hostname);
